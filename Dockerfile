@@ -1,10 +1,15 @@
 ARG VERSION=release-0.9
+ARG SEED_ROOT=/tackle2-seed
 
 FROM registry.access.redhat.com/ubi9-minimal as rulesets
 
+COPY . .
 ARG RULESETS_REF=release-0.9
+ARG SEED_ROOT
 RUN microdnf -y install git &&\
-    git clone https://github.com/konveyor/rulesets -b ${RULESETS_REF} &&\
+    if [ ! -d "${SEED_ROOT}" ]; then \
+        git clone https://github.com/konveyor/tackle2-seed -b ${RULESETS_REF} ${SEED_ROOT}; \
+    fi &&\
     git clone https://github.com/windup/windup-rulesets -b 6.3.1.Final
 
 FROM quay.io/konveyor/static-report:${VERSION} as static-report
